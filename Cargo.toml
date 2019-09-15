@@ -1,0 +1,55 @@
+[package]
+name = "dragobike"
+version = "0.0.1"
+authors = ["Marc <dkm@kataplop.net>"]
+description = "Dragon skin for Cargo Bike"
+keywords = ["arm", "cortex-m", "template"]
+categories = ["embedded", "no-std"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dkm/dragobike"
+
+[profile.release]
+lto = true
+codegen-units = 1
+debug = true
+panic = "abort"
+
+[profile.dev]
+lto = false
+codegen-units = 1
+debug = true
+panic = "abort"
+
+[dependencies]
+smart-leds = {git = "https://github.com/smart-leds-rs/smart-leds"}
+ws2812-spi = {git = "https://github.com/smart-leds-rs/ws2812-spi-rs"}
+tm4c123x-hal = {git = "https://github.com/dkm/tm4c123x-hal", features = ["rt"]}
+
+[dependencies.embedded-hal]
+version = "0.2.3"
+features = ["unproven"]
+
+[dependencies.cortex-m]
+version = "0.6.1"
+
+## [dependencies.tm4c-hal]
+## path = "../tm4c123x-hal/tm4c-hal"
+#[dependencies.tm4c123x-hal]
+#path = "../tm4c123x-hal/tm4c123x-hal"
+#features = ["rt"]
+
+[dependencies.cortex-m-rt]
+version = "0.6.10"
+
+[dependencies.ds323x]
+version = "0.2.0"
+
+[dependencies.cortex-m-semihosting]
+version = "0.3.5"
+
+[dependencies.panic-semihosting]
+version = "0.5.3"
+
+[dependencies.panic-halt]
+version = "0.2.0"
+
