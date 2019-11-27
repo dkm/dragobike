@@ -1,14 +1,19 @@
 #![no_main]
 #![no_std]
 
+extern crate embedded_hal as hal;
+
+
 //#[macro_use]
 extern crate cortex_m_rt;
+
+#[macro_use(block)]
+extern crate nb;
 
 use cortex_m_rt::{entry, exception};
 
 extern crate cortex_m_semihosting as sh;
 extern crate panic_semihosting;
-extern crate embedded_hal;
 
 extern crate tm4c123x_hal;
 
@@ -18,9 +23,11 @@ use tm4c123x_hal::sysctl::{self, SysctlExt};
 use tm4c123x_hal::gpio::{AF2};
 use tm4c123x_hal::gpio::GpioExt;
 use tm4c123x_hal::time::U32Ext;
+use tm4c123x_hal::timer::*;
 
 use core::fmt::Write;
-use embedded_hal as hal;
+
+use hal::prelude::*;
 
 extern crate smart_leds;
 extern crate ws2812_spi;
@@ -64,7 +71,20 @@ fn main() -> ! {
         &clocks,
         &sc.power_control
     );
+    writeln!(stdout, "SPI configured").unwrap();
 
+    writeln!(stdout, "Creating Timer").unwrap();
+
+    let mut timer0 = Timer::wtimer0(p.WTIMER0,
+                                   1.hz(),
+                                   &sc.power_control,
+                                   &clocks
+    );
+
+    writeln!(stdout, "Timer created").unwrap();
+    writeln!(stdout, "Will block until timeout").unwrap();
+    let _ret = block!(timer0.wait());
+    writeln!(stdout, "Timeout").unwrap();
     // ws2812
     const MAX: usize = 6;
 
@@ -93,8 +113,7 @@ fn main() -> ! {
         } else {
             count += 1;
         }
-
-        writeln!(stdout, "in da loop").unwrap();
+        let _ret = block!(timer0.wait());
     }
 }
 
