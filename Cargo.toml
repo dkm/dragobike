@@ -23,7 +23,10 @@ panic = "abort"
 [dependencies]
 smart-leds = {git = "https://github.com/smart-leds-rs/smart-leds"}
 ws2812-spi = {git = "https://github.com/smart-leds-rs/ws2812-spi-rs"}
-tm4c123x-hal = {git = "https://github.com/dkm/tm4c123x-hal", features = ["rt"]}
+tm4c123x-hal = {git = "https://github.com/thejpster/tm4c-hal.git", features = ["rt"]}
+
+[dependencies.nb]
+version = "0.1.2"
 
 [dependencies.embedded-hal]
 version = "0.2.3"
@@ -31,12 +34,6 @@ features = ["unproven"]
 
 [dependencies.cortex-m]
 version = "0.6.1"
-
-## [dependencies.tm4c-hal]
-## path = "../tm4c123x-hal/tm4c-hal"
-#[dependencies.tm4c123x-hal]
-#path = "../tm4c123x-hal/tm4c123x-hal"
-#features = ["rt"]
 
 [dependencies.cortex-m-rt]
 version = "0.6.10"
