@@ -3,7 +3,6 @@
 
 extern crate embedded_hal as hal;
 
-
 //#[macro_use]
 extern crate cortex_m_rt;
 
@@ -17,11 +16,11 @@ extern crate panic_semihosting;
 
 extern crate tm4c123x_hal;
 
-extern crate ds323x    ;
+extern crate ds323x;
 
-use tm4c123x_hal::sysctl::{self, SysctlExt};
-use tm4c123x_hal::gpio::{AF2};
 use tm4c123x_hal::gpio::GpioExt;
+use tm4c123x_hal::gpio::AF2;
+use tm4c123x_hal::sysctl::{self, SysctlExt};
 use tm4c123x_hal::time::U32Ext;
 use tm4c123x_hal::timer::*;
 
@@ -39,8 +38,8 @@ use ws2812_spi as ws2812;
 
 use smart_leds::{colors, SmartLedsWrite};
 
-use tm4c123x_hal::spi::{Spi};
 pub use crate::hal::spi::{MODE_0, MODE_1, MODE_2, MODE_3};
+use tm4c123x_hal::spi::Spi;
 
 use sh::hio;
 
@@ -63,23 +62,21 @@ fn main() -> ! {
     let mut portd = p.GPIO_PORTD.split(&sc.power_control);
     let spi = Spi::spi1(
         p.SSI1,
-        (portd.pd0.into_af_push_pull::<AF2>(&mut portd.control), // SCK
-         portd.pd2.into_af_push_pull::<AF2>(&mut portd.control), // Miso
-         portd.pd3.into_af_pull_down::<AF2>(&mut portd.control)), // Mosi
+        (
+            portd.pd0.into_af_push_pull::<AF2>(&mut portd.control), // SCK
+            portd.pd2.into_af_push_pull::<AF2>(&mut portd.control), // Miso
+            portd.pd3.into_af_pull_down::<AF2>(&mut portd.control),
+        ), // Mosi
         ws2812::MODE,
         3_000_000.hz(),
         &clocks,
-        &sc.power_control
+        &sc.power_control,
     );
     writeln!(stdout, "SPI configured").unwrap();
 
     writeln!(stdout, "Creating Timer").unwrap();
 
-    let mut timer0 = Timer::wtimer0(p.WTIMER0,
-                                   1.hz(),
-                                   &sc.power_control,
-                                   &clocks
-    );
+    let mut timer0 = Timer::wtimer0(p.WTIMER0, 1.hz(), &sc.power_control, &clocks);
 
     writeln!(stdout, "Timer created").unwrap();
     writeln!(stdout, "Will block until timeout").unwrap();
@@ -93,21 +90,28 @@ fn main() -> ! {
     //    let mut ws = ws2812::prerendered::Ws2812::new(spi, Timing::new(3_000_000).unwrap(), &mut rendered_data);
     let mut ws = ws2812::Ws2812::new(spi);
 
-    let mut data = [colors::BLUE, colors::GREEN,colors::GREEN,colors::GREEN,colors::GREEN,colors::GREEN ];
+    let mut data = [
+        colors::BLUE,
+        colors::GREEN,
+        colors::GREEN,
+        colors::GREEN,
+        colors::GREEN,
+        colors::GREEN,
+    ];
     let mut count = 0;
     let mut dir = true;
 
     loop {
         ws.write(data.iter().cloned()).unwrap();
 
-        if ! dir {
+        if !dir {
             data.rotate_left(1);
         } else {
             data.rotate_right(1);
         }
 
-        if count+2==MAX {
-//            writeln!(stdout, "swap").unwrap();
+        if count + 2 == MAX {
+            //            writeln!(stdout, "swap").unwrap();
             dir = !dir;
             count = 0;
         } else {
